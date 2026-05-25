@@ -12,18 +12,59 @@ const io = new Server(server, {
     }
 });
 
-io.on("connection", (socket) => {
-    console.log("Device connected:", socket.id);
+const connectedDevices = {};
 
-    socket.on("clipboard-sync", (data) => {
-        socket.broadcast.emit("clipboard-sync", data);
+io.on("connection", (socket) => {
+
+    console.log("🔌 Socket Connected:", socket.id);
+
+    socket.on("register-device", (deviceData) => {
+
+        connectedDevices[deviceData.deviceId] = {
+
+            deviceId: deviceData.deviceId,
+            socketId: socket.id,
+
+            deviceName: deviceData.deviceName,
+            deviceType: deviceData.deviceType,
+
+            online: true,
+            lastSeen: new Date()
+
+        };
+
+        console.log("✅ Device Registered");
+
+        io.emit(
+            "devices-updated",
+            Object.values(connectedDevices)
+        );
     });
 
     socket.on("disconnect", () => {
-        console.log("Disconnected:", socket.id);
+
+        console.log("❌ Socket Disconnected:", socket.id);
+
+        for (const deviceId in connectedDevices) {
+
+            if (
+                connectedDevices[deviceId].socketId === socket.id
+            ) {
+
+                connectedDevices[deviceId].online = false;
+
+                connectedDevices[deviceId].lastSeen = new Date();
+            }
+        }
+
+        io.emit(
+            "devices-updated",
+            Object.values(connectedDevices)
+        );
     });
+
 });
 
 server.listen(3000, () => {
-    console.log("Server running on port 3000");
+    console.log("🚀 SyncBridge Server Running");
 });
