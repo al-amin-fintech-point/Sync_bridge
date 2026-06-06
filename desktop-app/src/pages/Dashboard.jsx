@@ -1,12 +1,26 @@
 /**
- * FILE: /home/al-amin/Al-amin/Project/Sync_bridge/desktop-app/src/pages/Dashboard.jsx
- * DESCRIPTION: Central command center for the SyncBridge mesh network application.
+ * ============================================================================
+ * @file        /home/al-amin/Al-amin/Project/Sync_bridge/desktop-app/src/pages/Dashboard.jsx
+ * @project     SyncBridge - Multi-Device Mesh Network Architecture
+ * @type        Core Dashboard Page Component
+ * @version     1.2.0
+ * @date        2026-06-06
+ * @academic    Final Year Project ( B.Sc. in Computer Science & Engineering )
+ * @author      Md Al-Amin ( Associate Software Engineer )
+ * @email       mdallamininfo@gmail.com
+ * @phone       +880 1300-385188
+ * @github      https://github.com/al-amin5188/Sync_bridge
+ * @description Central command center for the SyncBridge mesh network application
+ * incorporating dual-hook core handshakes and clipboard distribution syncs.
+ * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
+ * ============================================================================
  */
 
 import { useState } from "react";
 import Header from "../components/Header";
 import DeviceList from "../components/DeviceList";
 import useDevices from "../hooks/useDevices";
+import useClipboardSync from "../hooks/useClipboardSync";
 
 export default function Dashboard() {
     const {
@@ -23,6 +37,9 @@ export default function Dashboard() {
         rejectPairRequest,
         disconnectPair
     } = useDevices();
+
+    // Isolated Clipboard Synchronization Engine ( Hook Triggered Inline )
+    const { lastCopiedText } = useClipboardSync( pairedDevices );
 
     const [ pinInput, setPinInput ] = useState( "" );
 
@@ -72,6 +89,18 @@ export default function Dashboard() {
             color: "#f8fafc",
             fontFamily: "monospace",
             wordBreak: "break-all"
+        },
+        clipboardBadge: {
+            fontSize: "11px",
+            background: "rgba( 99, 102, 241, 0.15 )",
+            color: "#818cf8",
+            border: "1px solid rgba( 99, 102, 241, 0.3 )",
+            padding: "4px 10px",
+            borderRadius: "20px",
+            display: "inline-block",
+            marginTop: "8px",
+            fontWeight: "500",
+            width: "fit-content"
         },
         statusBanner: {
             background: "linear-gradient( 135deg, rgba( 16, 185, 129, 0.1 ) 0%, rgba( 5, 150, 105, 0.1 ) 100% )",
@@ -137,7 +166,7 @@ export default function Dashboard() {
             borderRadius: "12px",
             color: "#ffffff",
             marginBottom: "16px",
-            letterSpacing: "8px",
+            letterSpacing: pinInput ? "8px" : "normal",
             outline: "none",
             transition: "border-color 0.2s ease"
         },
@@ -180,6 +209,12 @@ export default function Dashboard() {
                     <div style={ styles.infoGroup }>
                         <span style={ styles.label }>Current Device ID</span>
                         <span style={ styles.value }>{ deviceId }</span>
+                        { /* Phase 3 Clipboard Status Indicator */ }
+                        { lastCopiedText && (
+                            <span style={ styles.clipboardBadge }>
+                                📋 Clipboard Active Syncing
+                            </span>
+                        ) }
                     </div>
                     <div style={ styles.infoGroup }>
                         <span style={ styles.label }>Active Socket Session</span>

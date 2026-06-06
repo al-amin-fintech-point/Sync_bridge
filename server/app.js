@@ -36,7 +36,7 @@ const devicePairs = {};
 
 io.on( "connection", ( socket ) => {
 
-    console.log( "🔌 Socket Connected:", socket.id );
+    console.log( "Socket Connected:", socket.id );
 
     // Register a new device or re-establish session on connect
     socket.on( "register-device", ( deviceData ) => {
@@ -49,7 +49,7 @@ io.on( "connection", ( socket ) => {
             lastSeen: new Date()
         };
 
-        console.log( "✅ Device Registered" );
+        console.log( "Device Registered" );
 
         io.emit(
             "devices-updated",
@@ -59,7 +59,7 @@ io.on( "connection", ( socket ) => {
 
     // Handle abrupt socket disconnections
     socket.on("disconnect", () => {
-        console.log( "❌ Socket Disconnected:", socket.id );
+        console.log( "Socket Disconnected:", socket.id );
 
         for ( const deviceId in connectedDevices ) {
             if ( connectedDevices[ deviceId ].socketId === socket.id ) {
@@ -76,7 +76,7 @@ io.on( "connection", ( socket ) => {
 
     // Initiate pairing flow and generate secure 4-digit PIN
     socket.on( "send-pair-request", ( { fromDeviceId, toDeviceId } ) => {
-        console.log( `📩 Pair request triggered from ${fromDeviceId} to ${toDeviceId}` );
+        console.log( `Pair request triggered from ${fromDeviceId} to ${toDeviceId}` );
         
         const targetDevice = connectedDevices[ toDeviceId ];
         const senderDevice = connectedDevices[ fromDeviceId ];
@@ -97,13 +97,13 @@ io.on( "connection", ( socket ) => {
                 fromDeviceName: senderDevice.deviceName
             } );
             
-            console.log( `🔑 PIN [ ${generatedPin} ] generated for pairing.` );
+            console.log( `PIN [ ${generatedPin} ] generated for pairing.` );
         }
     } );
 
     // Validate PIN and establish room-bound bidirectional bridge
     socket.on( "accept-pair-request", ( { requesterId, accepterId, enteredPin } ) => {
-        console.log( `🤝 Verifying PIN for ${requesterId} and ${accepterId}` );
+        console.log( `Verifying PIN for ${requesterId} and ${accepterId}` );
         
         const pendingRequest = activePairRequests[ requesterId ];
         const requester = connectedDevices[ requesterId ];
@@ -136,7 +136,7 @@ io.on( "connection", ( socket ) => {
             } );
             
             delete activePairRequests[ requesterId ];
-            console.log( `✅ Multi-Pair successful for room: ${roomId}` );
+            console.log( `Multi-Pair successful for room: ${roomId}` );
         } else {
             io.to( accepter?.socketId ).emit( "pair-error", { message: "Invalid PIN! Please try again." } );
         }
@@ -144,7 +144,7 @@ io.on( "connection", ( socket ) => {
 
     // Teardown pairing maps and leave mutual socket channel
     socket.on( "disconnect-pair", ( { requesterId, targetId } ) => {
-        console.log( `🔌 Unpairing requested between ${requesterId} and ${targetId}` );
+        console.log( `Unpairing requested between ${requesterId} and ${targetId}` );
 
         const roomId = [ requesterId, targetId ].sort().join( "-" );
         const requester = connectedDevices[ requesterId ];
@@ -166,7 +166,7 @@ io.on( "connection", ( socket ) => {
 
     // Abort pending pair lifecycle before pin validation expires
     socket.on( "cancel-pair-request", ( { requesterId } ) => {
-        console.log( `🚫 Pair request canceled by requester or target for: ${requesterId}` );
+        console.log( `Pair request canceled by requester or target for: ${requesterId}` );
         
         const pendingRequest = activePairRequests[ requesterId ];
         const requester = connectedDevices[ requesterId ];
@@ -181,8 +181,36 @@ io.on( "connection", ( socket ) => {
         }
     } );
 
+    // Broadcast clipboard content to all securely paired devices in the network matrix
+    socket.on( "sync-clipboard", ( { text } ) => {
+        console.log( `Clipboard sync triggered from socket: ${ socket.id }` );
+
+        let senderDeviceId = null;
+        for ( const id in connectedDevices ) {
+            if ( connectedDevices[ id ].socketId === socket.id ) {
+                senderDeviceId = id;
+                break;
+            }
+        }
+
+        if ( senderDeviceId && devicePairs[ senderDeviceId ] ) {
+            const pairedNodes = devicePairs[ senderDeviceId ];
+
+            for ( const targetId in pairedNodes ) {
+                const roomId = pairedNodes[ targetId ];
+                
+                // Broadcast to the specific room, excluding the sender node
+                socket.to( roomId ).emit( "receive-clipboard-sync", {
+                    text: text,
+                    fromDeviceId: senderDeviceId
+                } );
+            }
+            console.log( `Clipboard data distributed to paired nodes of: ${ senderDeviceId }` );
+        }
+    } );
+
 } );
 
 server.listen( 3000, () => {
-    console.log( "🚀 SyncBridge Server Running on Port 3000" );
+    console.log( "SyncBridge Server Running on Port 3000" );
 } );
