@@ -46,8 +46,18 @@ export default function Dashboard() {
     // Isolated Clipboard Synchronization Engine ( Hook Triggered Inline )
     const { lastCopiedText } = useClipboardSync( pairedDevices );
 
-    // High-Volume Binary Data Streaming Engine
-    const { isSending, isReceiving, transferProgress, transferStatus, streamFile } = useFileTransfer( socketId, pairedDevices );
+    // High-Volume Binary Data Streaming Engine with Explicit Consent Handshakes
+    const { 
+        isSending, 
+        isReceiving, 
+        transferProgress, 
+        transferStatus, 
+        showIncomingAlert,
+        incomingFileMeta,
+        streamFile,
+        acceptIncomingFile,
+        declineIncomingFile
+    } = useFileTransfer( socketId, pairedDevices );
 
     const [ pinInput, setPinInput ] = useState( "" );
 
@@ -205,6 +215,13 @@ export default function Dashboard() {
             fontWeight: "600",
             marginTop: "-8px",
             marginBottom: "16px"
+        },
+        fileMetaBox: {
+            background: "rgba( 15, 23, 42, 0.4 )", 
+            padding: "16px", 
+            borderRadius: "12px", 
+            marginBottom: "24px", 
+            textAlign: "left"
         }
     };
 
@@ -323,6 +340,41 @@ export default function Dashboard() {
                                 style={ { ...styles.button, ...styles.secondaryBtn } }
                             >
                                 Decline Request
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) }
+
+            { showIncomingAlert && incomingFileMeta && (
+                <div style={ styles.modalOverlay }>
+                    <div style={ styles.modalContent }>
+                        <span style={ { fontSize: "40px", display: "block", marginBottom: "12px" } }>📥</span>
+                        <h3 style={ { margin: "0 0 8px 0", fontSize: "20px" } }>Incoming File Asset</h3>
+                        <p style={ { color: "#94a3b8", fontSize: "14px", lineHeight: "1.5", marginBottom: "8px" } }>
+                            A paired mesh node wants to share a file with you.
+                        </p>
+                        
+                        <div style={ styles.fileMetaBox }>
+                            <p style={ { margin: "0 0 4px 0", fontSize: "13px", color: "#94a3b8", fontWeight: "600" } }>File Name:</p>
+                            <p style={ { margin: "0 0 12px 0", fontSize: "14px", color: "#ffffff", fontFamily: "monospace", wordBreak: "break-all" } }>{ incomingFileMeta.fileName }</p>
+                            
+                            <p style={ { margin: "0 0 4px 0", fontSize: "13px", color: "#94a3b8", fontWeight: "600" } }>File Size:</p>
+                            <p style={ { margin: "0", fontSize: "14px", color: "#6366f1", fontWeight: "600" } }>{ ( incomingFileMeta.fileSize / ( 1024 * 1024 ) ).toFixed( 2 ) } MB</p>
+                        </div>
+
+                        <div>
+                            <button 
+                                onClick={ acceptIncomingFile } 
+                                style={ { ...styles.button, ...styles.primaryBtn } }
+                            >
+                                Accept & Download
+                            </button>
+                            <button 
+                                onClick={ declineIncomingFile } 
+                                style={ { ...styles.button, ...styles.secondaryBtn } }
+                            >
+                                Decline
                             </button>
                         </div>
                     </div>
