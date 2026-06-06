@@ -10,9 +10,8 @@ export default function useDevices() {
     const [incomingRequest, setIncomingRequest] = useState(null); 
     const [pairingInfo, setPairingInfo] = useState(null); 
     const [sentRequestTo, setSentRequestTo] = useState(null); 
-
-    const [generatedPin, setGeneratedPin] = useState("");
-    const [pairError, setPairError] = useState("");
+    const [generatedPin, setGeneratedPin] = useState(""); 
+    const [pairError, setPairError] = useState(""); 
 
     useEffect(() => {
         const savedDeviceId = getDeviceId();
@@ -36,7 +35,7 @@ export default function useDevices() {
 
         socket.on("receive-pair-request", (data) => {
             setIncomingRequest(data);
-            setPairError("");
+            setPairError(""); 
         });
 
         socket.on("pair-pin-generated", (data) => {
@@ -55,6 +54,13 @@ export default function useDevices() {
             setPairError(data.message);
         });
 
+        socket.on("pair-canceled", () => {
+            setIncomingRequest(null);
+            setSentRequestTo(null);
+            setGeneratedPin("");
+            setPairError("");
+        });
+
         socket.on("unpair-success", () => {
             setPairingInfo(null);
             setSentRequestTo(null);
@@ -70,6 +76,7 @@ export default function useDevices() {
             socket.off("pair-pin-generated");
             socket.off("pair-success");
             socket.off("pair-error");
+            socket.off("pair-canceled");
             socket.off("unpair-success");
         };
     }, []);
@@ -93,6 +100,8 @@ export default function useDevices() {
     };
 
     const rejectPairRequest = () => {
+        const targetRequesterId = incomingRequest ? incomingRequest.fromDeviceId : deviceId;
+        socket.emit("cancel-pair-request", { requesterId: targetRequesterId });
         setIncomingRequest(null);
         setPairError("");
     };
@@ -114,8 +123,8 @@ export default function useDevices() {
         incomingRequest,
         pairingInfo,
         sentRequestTo,
-        generatedPin,
-        pairError,
+        generatedPin, 
+        pairError,     
         sendPairRequest,
         acceptPairRequest,
         rejectPairRequest,

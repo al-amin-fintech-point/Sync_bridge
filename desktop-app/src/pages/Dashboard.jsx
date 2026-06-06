@@ -48,6 +48,7 @@ export default function Dashboard() {
                 sentRequestTo={sentRequestTo}
             />
 
+            {/* 🔑 ১. রিকোয়েস্ট সেন্ডারের জন্য পিন ডিসপ্লে মোডাল (Cancel বাটনসহ) */}
             {generatedPin && (
                 <div style={{
                     position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
@@ -59,11 +60,17 @@ export default function Dashboard() {
                         <h1 style={{ letterSpacing: "8px", color: "#007BFF", background: "#f0f0f0", padding: "10px", borderRadius: "5px", margin: "15px 0" }}>
                             {generatedPin}
                         </h1>
-                        <p style={{ fontSize: "12px", color: "gray" }}>Waiting for authorization...</p>
+                        <button 
+                            onClick={rejectPairRequest} // হুকের ক্যানসেল ফাংশন কল হবে
+                            style={{ background: "#f44336", color: "#fff", padding: "8px 20px", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold", marginTop: "10px" }}
+                        >
+                            Cancel Request
+                        </button>
                     </div>
                 </div>
             )}
 
+            {/* 🤝 ২. রিকোয়েস্ট রিসিভারের জন্য পিন ইনপুট মোডাল */}
             {incomingRequest && (
                 <div style={{
                     position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
@@ -90,7 +97,7 @@ export default function Dashboard() {
                             <button 
                                 onClick={() => {
                                     acceptPairRequest(pinInput);
-                                    setPinInput("");
+                                    setPinInput(""); 
                                 }} 
                                 style={{ background: "#4CAF50", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "4px", marginRight: "10px", cursor: "pointer", fontWeight: "bold" }}
                             >

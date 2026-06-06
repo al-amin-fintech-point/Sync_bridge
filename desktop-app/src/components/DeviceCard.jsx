@@ -1,6 +1,11 @@
-export default function DeviceCard({ device, currentDeviceId, onPairClick, pairingInfo }) {
+export default function DeviceCard({ device, currentDeviceId, onPairClick, onUnpairClick, pairingInfo, sentRequestTo }) {
     const isMe = device.deviceId === currentDeviceId;
+    
+    // 🔒 চেক করা হচ্ছে এই ডিভাইসটির আইডিই পেয়ারড আইডি কিনা
     const isPairedWithThisDevice = pairingInfo && pairingInfo.pairedWith === device.deviceId;
+    
+    // ⏳ চেক করা হচ্ছে একে রিকোয়েস্ট পাঠানো হয়েছে কিনা
+    const isWaitingForThisDevice = sentRequestTo === device.deviceId;
 
     return (
         <div
@@ -10,7 +15,7 @@ export default function DeviceCard({ device, currentDeviceId, onPairClick, pairi
                 marginBottom: "10px",
                 borderRadius: "10px",
                 display: "flex",
-                justifyContent: "space-between", // 👈 এখানে 'space-between' করে দেওয়া হয়েছে
+                justifyContent: "space-between",
                 alignItems: "center"
             }}
         >
@@ -29,15 +34,30 @@ export default function DeviceCard({ device, currentDeviceId, onPairClick, pairi
             {!isMe && (
                 <div>
                     {isPairedWithThisDevice ? (
-                        <span style={{ background: "#4CAF50", color: "white", padding: "8px 12px", borderRadius: "5px", fontWeight: "bold" }}>
-                            ✓ Paired
+                        /* 🔴 ডিসকানেক্ট বাটন */
+                        <button
+                            onClick={() => onUnpairClick(device.deviceId)}
+                            style={{
+                                background: "#dc3545",
+                                color: "white",
+                                border: "none",
+                                padding: "8px 15px",
+                                borderRadius: "5px",
+                                cursor: "pointer",
+                                fontWeight: "bold"
+                            }}
+                        >
+                            Disconnect
+                        </button>
+                    ) : isWaitingForThisDevice ? (
+                        /* ⏳ রিকোয়েস্ট পাঠানো অবস্থা */
+                        <span style={{ color: "#ffc107", fontWeight: "bold", fontSize: "14px" }}>
+                            ⏳ Sending Request...
                         </span>
                     ) : (
+                        /* 🔵 নরমাল স্টেট: পেয়ার বাটন */
                         <button
-                            onClick={() => {
-                                console.log("Button Clicked for device:", device.deviceId); // 👈 ট্রেস করার জন্য লগ
-                                onPairClick(device.deviceId);
-                            }}
+                            onClick={() => onPairClick(device.deviceId)}
                             disabled={!device.online}
                             style={{
                                 background: device.online ? "#007BFF" : "#CCCCCC",

@@ -134,6 +134,22 @@ io.on("connection", (socket) => {
         if (target) io.to(target.socketId).emit("unpair-success");
     });
 
+    socket.on("cancel-pair-request", ({ requesterId }) => {
+        console.log(`🚫 Pair request canceled by requester or target for: ${requesterId}`);
+        
+        const pendingRequest = activePairRequests[requesterId];
+        const requester = connectedDevices[requesterId];
+        
+        if (pendingRequest) {
+            const target = connectedDevices[pendingRequest.targetDeviceId];
+            
+            if (requester) io.to(requester.socketId).emit("pair-canceled");
+            if (target) io.to(target.socketId).emit("pair-canceled");
+            
+            delete activePairRequests[requesterId];
+        }
+    });
+
 });
 
 server.listen(3000, () => {
