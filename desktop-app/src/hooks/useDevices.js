@@ -108,14 +108,23 @@ export default function useDevices() {
         setPairError("");
     };
 
+    // const disconnectPair = (targetDeviceId) => {
+    //     if (pairingInfo) {
+    //         socket.emit("disconnect-pair", {
+    //             roomId: pairingInfo.roomId,
+    //             requesterId: deviceId,
+    //             targetId: targetDeviceId
+    //         });
+    //     }
+    // };
+
     const disconnectPair = (targetDeviceId) => {
-        if (pairingInfo) {
-            socket.emit("disconnect-pair", {
-                roomId: pairingInfo.roomId,
-                requesterId: deviceId,
-                targetId: targetDeviceId
-            });
-        }
+        console.log("📡 Emitting disconnect-pair from Client for target:", targetDeviceId);
+        
+        socket.emit("disconnect-pair", {
+            requesterId: deviceId,   // আপনার কারেন্ট ডিভাইস আইডি
+            targetId: targetDeviceId // যে ডিভাইসটি ডিসকানেক্ট করছেন
+        });
     };
 
     return {
