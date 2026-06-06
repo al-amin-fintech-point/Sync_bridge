@@ -1,6 +1,13 @@
 import DeviceCard from "./DeviceCard";
 
-export default function DeviceList({ devices, currentDeviceId, onPairClick, pairingInfo }) {
+export default function DeviceList({ 
+    devices, 
+    currentDeviceId, 
+    onPairClick, 
+    onUnpairClick, // 💡 যোগ করা হয়েছে
+    pairingInfo, 
+    sentRequestTo  // 💡 যোগ করা হয়েছে
+}) {
     return (
         <div>
             <h2>Connected Devices</h2>
@@ -11,7 +18,9 @@ export default function DeviceList({ devices, currentDeviceId, onPairClick, pair
                         device={device}
                         currentDeviceId={currentDeviceId}
                         onPairClick={onPairClick}
+                        onUnpairClick={onUnpairClick} // 💡 কার্ডে পাস করা হলো
                         pairingInfo={pairingInfo}
+                        sentRequestTo={sentRequestTo}   // 💡 কার্ডে পাস করা হলো
                     />
                 ))
             }
