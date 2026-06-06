@@ -209,6 +209,36 @@ io.on( "connection", ( socket ) => {
         }
     } );
 
+    /**
+     * Relays file metadata handshake packet to the targeted mesh peer node.
+     */
+    socket.on( "file-meta", ( data ) => {
+        const { to, fileName, fileSize, totalChunks } = data;
+        if ( to ) {
+            io.to( to ).emit( "file-meta", {
+                from: socket.id,
+                fileName,
+                fileSize,
+                totalChunks
+            } );
+        }
+    } );
+
+    /**
+     * Relays high-frequency binary array buffer chunks sequentially to the target peer.
+     */
+    socket.on( "file-chunk", ( data ) => {
+        const { to, chunk, chunkIndex } = data;
+        if ( to ) {
+            io.to( to ).emit( "file-chunk", {
+                from: socket.id,
+                chunk,
+                chunkIndex
+            } );
+        }
+    } );
+
+
 } );
 
 server.listen( 3000, () => {
