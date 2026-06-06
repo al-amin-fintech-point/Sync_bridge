@@ -1,8 +1,5 @@
 export default function DeviceCard({ device, currentDeviceId, onPairClick, pairingInfo }) {
-    // চেক করা হচ্ছে এটা নিজের ল্যাপটপ কিনা
     const isMe = device.deviceId === currentDeviceId;
-    
-    // চেক করা হচ্ছে এই নির্দিষ্ট ডিভাইসটির সাথে অলরেডি পেয়ারিং সাকসেসফুল কিনা
     const isPairedWithThisDevice = pairingInfo && pairingInfo.pairedWith === device.deviceId;
 
     return (
@@ -13,7 +10,7 @@ export default function DeviceCard({ device, currentDeviceId, onPairClick, pairi
                 marginBottom: "10px",
                 borderRadius: "10px",
                 display: "flex",
-                justifyContent: "between",
+                justifyContent: "space-between", // 👈 এখানে 'space-between' করে দেওয়া হয়েছে
                 alignItems: "center"
             }}
         >
@@ -29,7 +26,6 @@ export default function DeviceCard({ device, currentDeviceId, onPairClick, pairi
                 </p>
             </div>
 
-            {/* 🛠️ পেয়ার বাটন কন্ডিশনাল রেন্ডারিং */}
             {!isMe && (
                 <div>
                     {isPairedWithThisDevice ? (
@@ -38,7 +34,10 @@ export default function DeviceCard({ device, currentDeviceId, onPairClick, pairi
                         </span>
                     ) : (
                         <button
-                            onClick={() => onPairClick(device.deviceId)}
+                            onClick={() => {
+                                console.log("Button Clicked for device:", device.deviceId); // 👈 ট্রেস করার জন্য লগ
+                                onPairClick(device.deviceId);
+                            }}
                             disabled={!device.online}
                             style={{
                                 background: device.online ? "#007BFF" : "#CCCCCC",
