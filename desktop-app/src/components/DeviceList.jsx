@@ -19,7 +19,7 @@ export default function DeviceList({
                         currentDeviceId={currentDeviceId}
                         onPairClick={onPairClick}
                         onUnpairClick={onUnpairClick} // 💡 কার্ডে পাস করা হলো
-                        pairingInfo={pairingInfo}
+                        pairedDevices={pairedDevices}
                         sentRequestTo={sentRequestTo}   // 💡 কার্ডে পাস করা হলো
                     />
                 ))

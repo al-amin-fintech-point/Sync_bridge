@@ -16,6 +16,8 @@ const connectedDevices = {};
 
 const activePairRequests = {};
 
+const devicePairs = {};
+
 io.on("connection", (socket) => {
 
     console.log("🔌 Socket Connected:", socket.id);
@@ -91,7 +93,7 @@ io.on("connection", (socket) => {
         }
     });
 
-    socket.on("accept-pair-request", ({ requesterId, accepterId, enteredPin }) => {
+   socket.on("accept-pair-request", ({ requesterId, accepterId, enteredPin }) => {
         console.log(`🤝 Verifying PIN for ${requesterId} and ${accepterId}`);
         
         const pendingRequest = activePairRequests[requesterId];
@@ -100,27 +102,42 @@ io.on("connection", (socket) => {
 
         if (pendingRequest && pendingRequest.pin === enteredPin && pendingRequest.targetDeviceId === accepterId) {
             
-            const roomId = `room-${requesterId}-${accepterId}`;
+            // রুম আইডি জেনারেট (সবসময় ছোট আইডি আগে রেখে ইউনিক রুম আইডি করা ভালো)
+            const roomId = [requesterId, accepterId].sort().join("-");
+            
             const requesterSocket = io.sockets.sockets.get(requester?.socketId);
             const accepterSocket = io.sockets.sockets.get(accepter?.socketId);
 
             if (requesterSocket) requesterSocket.join(roomId);
             if (accepterSocket) accepterSocket.join(roomId);
 
-            io.to(requester.socketId).emit("pair-success", { pairedWith: accepterId, roomId });
-            io.to(accepter.socketId).emit("pair-success", { pairedWith: requesterId, roomId });
+            // 💡 মেমরিতে মাল্টিপল পেয়ার সেভ করা
+            if (!devicePairs[requesterId]) devicePairs[requesterId] = {};
+            if (!devicePairs[accepterId]) devicePairs[accepterId] = {};
+            
+            devicePairs[requesterId][accepterId] = roomId;
+            devicePairs[accepterId][requesterId] = roomId;
+
+            // উভয়কে তাদের নতুন পেয়ারড ডিভাইসের লিস্ট পাঠানো
+            io.to(requester.socketId).emit("pair-success", { 
+                pairedDevices: devicePairs[requesterId] 
+            });
+            io.to(accepter.socketId).emit("pair-success", { 
+                pairedDevices: devicePairs[accepterId] 
+            });
             
             delete activePairRequests[requesterId];
-            console.log(`✅ PIN Verified! Pair successful.`);
+            console.log(`✅ Multi-Pair successful for room: ${roomId}`);
         } else {
             io.to(accepter?.socketId).emit("pair-error", { message: "Invalid PIN! Please try again." });
-            console.log(`❌ Invalid PIN entered by target device.`);
         }
     });
 
-    socket.on("disconnect-pair", ({ roomId, requesterId, targetId }) => {
+    // 🔌 ২. ডিসকানেক্ট করা (নির্দিষ্ট ডিভাইস আনপেয়ার করা)
+    socket.on("disconnect-pair", ({ requesterId, targetId }) => {
         console.log(`🔌 Unpairing requested between ${requesterId} and ${targetId}`);
 
+        const roomId = [requesterId, targetId].sort().join("-");
         const requester = connectedDevices[requesterId];
         const target = connectedDevices[targetId];
 
@@ -130,8 +147,13 @@ io.on("connection", (socket) => {
         if (requesterSocket) requesterSocket.leave(roomId);
         if (targetSocket) targetSocket.leave(roomId);
 
-        if (requester) io.to(requester.socketId).emit("unpair-success");
-        if (target) io.to(target.socketId).emit("unpair-success");
+        // মেমরি থেকে এই স্পেসিফিক পেয়ারটি ডিলিট করা
+        if (devicePairs[requesterId]) delete devicePairs[requesterId][targetId];
+        if (devicePairs[targetId]) delete devicePairs[targetId][requesterId];
+
+        // উভয়কে আপডেটেড লিস্ট পাঠানো
+        if (requester) io.to(requester.socketId).emit("unpair-success", { pairedDevices: devicePairs[requesterId] || {} });
+        if (target) io.to(target.socketId).emit("unpair-success", { pairedDevices: devicePairs[targetId] || {} });
     });
 
     socket.on("cancel-pair-request", ({ requesterId }) => {

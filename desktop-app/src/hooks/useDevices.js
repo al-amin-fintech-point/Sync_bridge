@@ -13,6 +13,8 @@ export default function useDevices() {
     const [generatedPin, setGeneratedPin] = useState(""); 
     const [pairError, setPairError] = useState(""); 
 
+    const [pairedDevices, setPairedDevices] = useState({});
+
     useEffect(() => {
         const savedDeviceId = getDeviceId();
         setDeviceId(savedDeviceId);
@@ -43,7 +45,7 @@ export default function useDevices() {
         });
 
         socket.on("pair-success", (data) => {
-            setPairingInfo(data);
+            setPairedDevices(data.pairedDevices || {});
             setIncomingRequest(null);
             setSentRequestTo(null);
             setGeneratedPin("");
@@ -61,12 +63,12 @@ export default function useDevices() {
             setPairError("");
         });
 
-        socket.on("unpair-success", () => {
-            setPairingInfo(null);
+        socket.on("unpair-success", (data) => {
+            setPairedDevices(data.pairedDevices || {});
             setSentRequestTo(null);
             setGeneratedPin("");
             setPairError("");
-            alert("Devices unpaired successfully!");
+            alert("Device updated successfully!");
         });
 
         return () => {
@@ -121,7 +123,7 @@ export default function useDevices() {
         deviceId,
         devices,
         incomingRequest,
-        pairingInfo,
+        pairedDevices,
         sentRequestTo,
         generatedPin, 
         pairError,     

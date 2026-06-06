@@ -1,10 +1,8 @@
 export default function DeviceCard({ device, currentDeviceId, onPairClick, onUnpairClick, pairingInfo, sentRequestTo }) {
     const isMe = device.deviceId === currentDeviceId;
     
-    // 🔒 চেক করা হচ্ছে এই ডিভাইসটির আইডিই পেয়ারড আইডি কিনা
-    const isPairedWithThisDevice = pairingInfo && pairingInfo.pairedWith === device.deviceId;
+    const isPairedWithThisDevice = pairedDevices && !!pairedDevices[device.deviceId]; 
     
-    // ⏳ চেক করা হচ্ছে একে রিকোয়েস্ট পাঠানো হয়েছে কিনা
     const isWaitingForThisDevice = sentRequestTo === device.deviceId;
 
     return (

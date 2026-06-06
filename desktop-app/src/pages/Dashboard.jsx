@@ -44,7 +44,7 @@ export default function Dashboard() {
                 currentDeviceId={deviceId}
                 onPairClick={sendPairRequest}
                 onUnpairClick={disconnectPair}
-                pairingInfo={pairingInfo}
+                pairedDevices={pairedDevices}
                 sentRequestTo={sentRequestTo}
             />
 
