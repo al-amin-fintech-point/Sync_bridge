@@ -5,7 +5,7 @@ export default function DeviceList({
     currentDeviceId, 
     onPairClick, 
     onUnpairClick, // 💡 যোগ করা হয়েছে
-    pairingInfo, 
+    pairedDevices,
     sentRequestTo  // 💡 যোগ করা হয়েছে
 }) {
     return (

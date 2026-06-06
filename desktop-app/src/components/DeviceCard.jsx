@@ -1,4 +1,4 @@
-export default function DeviceCard({ device, currentDeviceId, onPairClick, onUnpairClick, pairingInfo, sentRequestTo }) {
+export default function DeviceCard({ device, currentDeviceId, onPairClick, onUnpairClick, pairedDevices, sentRequestTo }) {
     const isMe = device.deviceId === currentDeviceId;
     
     const isPairedWithThisDevice = pairedDevices && !!pairedDevices[device.deviceId]; 

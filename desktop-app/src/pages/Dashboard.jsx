@@ -9,7 +9,7 @@ export default function Dashboard() {
         deviceId,
         devices,
         incomingRequest,
-        pairingInfo,
+        pairedDevices, // 💡 pairingInfo বদলে এখানে 'pairedDevices' রিসিভ করা হলো
         sentRequestTo,
         generatedPin,
         pairError,
@@ -21,6 +21,9 @@ export default function Dashboard() {
 
     const [pinInput, setPinInput] = useState("");
 
+    // 💡 pairedDevices অবজেক্টের ভেতর কয়টি ডিভাইস কানেক্টেড আছে তা গণনা করা
+    const pairedDeviceCount = pairedDevices ? Object.keys(pairedDevices).length : 0;
+
     return (
         <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
             <Header />
@@ -29,10 +32,11 @@ export default function Dashboard() {
             <p><strong>Device ID:</strong><br />{deviceId}</p>
             <p><strong>Socket ID:</strong><br />{socketId}</p>
 
-            {pairingInfo && (
+            {/* 🔒 যদি অন্তত একটি ডিভাইসও পেয়ারড থাকে, তবে মেশ নেটওয়ার্ক স্ট্যাটাস বার দেখাবে */}
+            {pairedDeviceCount > 0 && (
                 <div style={{ background: "#e0f7fa", padding: "12px", borderRadius: "6px", marginBottom: "20px", border: "1px solid #00acc1" }}>
                     <p style={{ margin: 0, color: "#006064" }}>
-                        🔒 <strong>Status: Paired Securely</strong> (Room: {pairingInfo.roomId})
+                        🔒 <strong>Status: Connected to Mesh Network</strong> ({pairedDeviceCount} {pairedDeviceCount === 1 ? "device" : "devices"} paired)
                     </p>
                 </div>
             )}
@@ -44,11 +48,11 @@ export default function Dashboard() {
                 currentDeviceId={deviceId}
                 onPairClick={sendPairRequest}
                 onUnpairClick={disconnectPair}
-                pairedDevices={pairedDevices}
+                pairedDevices={pairedDevices} // 💡 এটি এখন হুক থেকে ডিফাইনড ডেটা পাবে
                 sentRequestTo={sentRequestTo}
             />
 
-            {/* 🔑 ১. রিকোয়েস্ট সেন্ডারের জন্য পিন ডিসপ্লে মোডাল (Cancel বাটনসহ) */}
+            {/* 🔑 ১. রিকোয়েস্ট সেন্ডারের জন্য পিন ডিসপ্লে মোডাল (Cancel বাটনসহ) */}
             {generatedPin && (
                 <div style={{
                     position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
@@ -61,7 +65,7 @@ export default function Dashboard() {
                             {generatedPin}
                         </h1>
                         <button 
-                            onClick={rejectPairRequest} // হুকের ক্যানসেল ফাংশন কল হবে
+                            onClick={rejectPairRequest} 
                             style={{ background: "#f44336", color: "#fff", padding: "8px 20px", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold", marginTop: "10px" }}
                         >
                             Cancel Request
@@ -70,7 +74,7 @@ export default function Dashboard() {
                 </div>
             )}
 
-            {/* 🤝 ২. রিকোয়েস্ট রিসিভারের জন্য পিন ইনপুট মোডাল */}
+            {/* 🤝 ২. রিকোয়েস্ট রিসিভারের জন্য পিন ইনপুট মোডাল */}
             {incomingRequest && (
                 <div style={{
                     position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
