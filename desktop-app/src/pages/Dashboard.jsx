@@ -1,3 +1,8 @@
+/**
+ * FILE: /home/al-amin/Al-amin/Project/Sync_bridge/desktop-app/src/pages/Dashboard.jsx
+ * DESCRIPTION: Central command center for the SyncBridge mesh network application.
+ */
+
 import { useState } from "react";
 import Header from "../components/Header";
 import DeviceList from "../components/DeviceList";
@@ -9,7 +14,7 @@ export default function Dashboard() {
         deviceId,
         devices,
         incomingRequest,
-        pairedDevices, // 💡 pairingInfo বদলে এখানে 'pairedDevices' রিসিভ করা হলো
+        pairedDevices, 
         sentRequestTo,
         generatedPin,
         pairError,
@@ -19,107 +24,255 @@ export default function Dashboard() {
         disconnectPair
     } = useDevices();
 
-    const [pinInput, setPinInput] = useState("");
+    const [ pinInput, setPinInput ] = useState( "" );
 
-    // 💡 pairedDevices অবজেক্টের ভেতর কয়টি ডিভাইস কানেক্টেড আছে তা গণনা করা
-    const pairedDeviceCount = pairedDevices ? Object.keys(pairedDevices).length : 0;
+    /**
+     * Calculates the total number of currently established secure connections
+     * within the localized mesh network.
+     */
+    const pairedDeviceCount = pairedDevices ? Object.keys( pairedDevices ).length : 0;
+
+    const styles = {
+        wrapper: {
+            minHeight: "100vh",
+            background: "#0f172a",
+            color: "#f1f5f9",
+            fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
+            padding: "40px"
+        },
+        container: {
+            maxWidth: "900px",
+            margin: "0 auto"
+        },
+        userCard: {
+            background: "rgba( 30, 41, 59, 0.5 )",
+            border: "1px solid rgba( 255, 255, 255, 0.1 )",
+            borderRadius: "20px",
+            padding: "24px",
+            marginBottom: "32px",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "20px"
+        },
+        infoGroup: {
+            display: "flex",
+            flexDirection: "column",
+            gap: "4px"
+        },
+        label: {
+            fontSize: "12px",
+            fontWeight: "600",
+            color: "#94a3b8",
+            textTransform: "uppercase",
+            letterSpacing: "0.05em"
+        },
+        value: {
+            fontSize: "15px",
+            fontWeight: "500",
+            color: "#f8fafc",
+            fontFamily: "monospace",
+            wordBreak: "break-all"
+        },
+        statusBanner: {
+            background: "linear-gradient( 135deg, rgba( 16, 185, 129, 0.1 ) 0%, rgba( 5, 150, 105, 0.1 ) 100% )",
+            border: "1px solid rgba( 16, 185, 129, 0.2 )",
+            padding: "16px 24px",
+            borderRadius: "12px",
+            marginBottom: "32px",
+            display: "flex",
+            alignItems: "center",
+            gap: "12px"
+        },
+        statusIcon: {
+            fontSize: "20px"
+        },
+        statusText: {
+            margin: 0,
+            fontSize: "14px",
+            color: "#10b981",
+            fontWeight: "600"
+        },
+        modalOverlay: {
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            background: "rgba( 2, 6, 23, 0.8 )",
+            backdropFilter: "blur( 8px )",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 1000,
+            animation: "fadeIn 0.3s ease"
+        },
+        modalContent: {
+            background: "#1e293b",
+            border: "1px solid rgba( 255, 255, 255, 0.1 )",
+            padding: "40px",
+            borderRadius: "24px",
+            textAlign: "center",
+            boxShadow: "0 25px 50px -12px rgba( 0, 0, 0, 0.5 )",
+            maxWidth: "400px",
+            width: "90%"
+        },
+        pinDisplay: {
+            letterSpacing: "12px",
+            color: "#6366f1",
+            background: "rgba( 99, 102, 241, 0.1 )",
+            padding: "20px",
+            borderRadius: "16px",
+            margin: "24px 0",
+            fontSize: "36px",
+            fontWeight: "800",
+            border: "1px dashed rgba( 99, 102, 241, 0.3 )"
+        },
+        input: {
+            background: "rgba( 15, 23, 42, 0.5 )",
+            border: "1px solid rgba( 255, 255, 255, 0.1 )",
+            padding: "16px",
+            fontSize: "24px",
+            width: "100%",
+            textAlign: "center",
+            borderRadius: "12px",
+            color: "#ffffff",
+            marginBottom: "16px",
+            letterSpacing: "8px",
+            outline: "none",
+            transition: "border-color 0.2s ease"
+        },
+        button: {
+            padding: "12px 24px",
+            borderRadius: "12px",
+            fontSize: "15px",
+            fontWeight: "600",
+            cursor: "pointer",
+            border: "none",
+            transition: "all 0.2s ease"
+        },
+        primaryBtn: {
+            background: "linear-gradient( 135deg, #6366f1 0%, #4f46e5 100% )",
+            color: "#ffffff",
+            width: "100%",
+            marginBottom: "12px"
+        },
+        secondaryBtn: {
+            background: "transparent",
+            color: "#94a3b8",
+            border: "1px solid rgba( 148, 163, 184, 0.2 )",
+            width: "100%"
+        },
+        errorText: {
+            color: "#ef4444",
+            fontSize: "13px",
+            fontWeight: "600",
+            marginTop: "-8px",
+            marginBottom: "16px"
+        }
+    };
 
     return (
-        <div style={{ padding: "30px", fontFamily: "sans-serif" }}>
-            <Header />
+        <div style={ styles.wrapper }>
+            <div style={ styles.container }>
+                <Header />
 
-            <h2>Your Device</h2>
-            <p><strong>Device ID:</strong><br />{deviceId}</p>
-            <p><strong>Socket ID:</strong><br />{socketId}</p>
-
-            {/* 🔒 যদি অন্তত একটি ডিভাইসও পেয়ারড থাকে, তবে মেশ নেটওয়ার্ক স্ট্যাটাস বার দেখাবে */}
-            {pairedDeviceCount > 0 && (
-                <div style={{ background: "#e0f7fa", padding: "12px", borderRadius: "6px", marginBottom: "20px", border: "1px solid #00acc1" }}>
-                    <p style={{ margin: 0, color: "#006064" }}>
-                        🔒 <strong>Status: Connected to Mesh Network</strong> ({pairedDeviceCount} {pairedDeviceCount === 1 ? "device" : "devices"} paired)
-                    </p>
+                <div style={ styles.userCard }>
+                    <div style={ styles.infoGroup }>
+                        <span style={ styles.label }>Current Device ID</span>
+                        <span style={ styles.value }>{ deviceId }</span>
+                    </div>
+                    <div style={ styles.infoGroup }>
+                        <span style={ styles.label }>Active Socket Session</span>
+                        <span style={ styles.value }>{ socketId }</span>
+                    </div>
                 </div>
-            )}
 
-            <hr />
+                { /** Network Status Visualization */ }
+                { pairedDeviceCount > 0 && (
+                    <div style={ styles.statusBanner }>
+                        <span style={ styles.statusIcon }>🛡️</span>
+                        <p style={ styles.statusText }>
+                            Securely connected to { pairedDeviceCount } peer{ pairedDeviceCount === 1 ? "" : "s" } in the Mesh Network.
+                        </p>
+                    </div>
+                ) }
 
-            <DeviceList 
-                devices={devices} 
-                currentDeviceId={deviceId}
-                onPairClick={sendPairRequest}
-                onUnpairClick={disconnectPair}
-                pairedDevices={pairedDevices} // 💡 এটি এখন হুক থেকে ডিফাইনড ডেটা পাবে
-                sentRequestTo={sentRequestTo}
-            />
+                <div style={ { borderTop: "1px solid rgba( 255, 255, 255, 0.05 )", paddingTop: "8px" } }>
+                    <DeviceList 
+                        devices={ devices } 
+                        currentDeviceId={ deviceId }
+                        onPairClick={ sendPairRequest }
+                        onUnpairClick={ disconnectPair }
+                        pairedDevices={ pairedDevices } 
+                        sentRequestTo={ sentRequestTo }
+                    />
+                </div>
+            </div>
 
-            {/* 🔑 ১. রিকোয়েস্ট সেন্ডারের জন্য পিন ডিসপ্লে মোডাল (Cancel বাটনসহ) */}
-            {generatedPin && (
-                <div style={{
-                    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-                    background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999
-                }}>
-                    <div style={{ background: "#fff", padding: "30px", borderRadius: "8px", textAlign: "center", boxShadow: "0 4px 15px rgba(0,0,0,0.3)" }}>
-                        <h3 style={{ margin: "0 0 10px 0" }}>🔑 Secure Pairing PIN</h3>
-                        <p style={{ color: "#555" }}>Enter this PIN on the target device to pair securely:</p>
-                        <h1 style={{ letterSpacing: "8px", color: "#007BFF", background: "#f0f0f0", padding: "10px", borderRadius: "5px", margin: "15px 0" }}>
-                            {generatedPin}
-                        </h1>
+            { /** Outgoing Pairing Request PIN Verification Modal */ }
+            { generatedPin && (
+                <div style={ styles.modalOverlay }>
+                    <div style={ styles.modalContent }>
+                        <h3 style={ { margin: "0 0 8px 0", fontSize: "20px" } }>🔑 Verification Required</h3>
+                        <p style={ { color: "#94a3b8", fontSize: "14px", lineHeight: "1.5" } }>
+                            To establish a secure bridge, enter this temporary PIN on the physical device you are connecting to.
+                        </p>
+                        <div style={ styles.pinDisplay }>
+                            { generatedPin }
+                        </div>
                         <button 
-                            onClick={rejectPairRequest} 
-                            style={{ background: "#f44336", color: "#fff", padding: "8px 20px", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold", marginTop: "10px" }}
+                            onClick={ rejectPairRequest } 
+                            style={ { ...styles.button, ...styles.secondaryBtn } }
                         >
-                            Cancel Request
+                            Cancel Connection
                         </button>
                     </div>
                 </div>
-            )}
+            ) }
 
-            {/* 🤝 ২. রিকোয়েস্ট রিসিভারের জন্য পিন ইনপুট মোডাল */}
-            {incomingRequest && (
-                <div style={{
-                    position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
-                    background: "rgba(0,0,0,0.5)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999
-                }}>
-                    <div style={{ background: "#fff", padding: "25px", borderRadius: "8px", textAlign: "center", boxShadow: "0 4px 15px rgba(0,0,0,0.3)", minWidth: "320px" }}>
-                        <h3 style={{ margin: "0 0 10px 0" }}>🤝 Pairing Request</h3>
-                        <p style={{ color: "#555", marginBottom: "15px" }}>
-                            <strong>{incomingRequest.fromDeviceName}</strong> wants to pair with you.
+            { /** Incoming Pairing Request Authentication Modal */ }
+            { incomingRequest && (
+                <div style={ styles.modalOverlay }>
+                    <div style={ styles.modalContent }>
+                        <h3 style={ { margin: "0 0 8px 0", fontSize: "20px" } }>🤝 Connection Request</h3>
+                        <p style={ { color: "#94a3b8", fontSize: "14px", lineHeight: "1.5", marginBottom: "24px" } }>
+                            <strong style={ { color: "#ffffff" } }>{ incomingRequest.fromDeviceName }</strong> is requesting to bridge with your device.
                         </p>
                         
                         <input 
                             type="text" 
-                            maxLength={4}
-                            placeholder="Enter 4-Digit PIN"
-                            value={pinInput}
-                            onChange={(e) => setPinInput(e.target.value)}
-                            style={{ padding: "10px", fontSize: "18px", width: "80%", textAlign: "center", borderRadius: "5px", border: "1px solid #ccc", marginBottom: "10px", letterSpacing: "4px" }}
+                            maxLength={ 4 }
+                            placeholder="----"
+                            value={ pinInput }
+                            onChange={ ( e ) => setPinInput( e.target.value ) }
+                            style={ styles.input }
                         />
 
-                        {pairError && <p style={{ color: "#dc3545", margin: "5px 0", fontSize: "14px", fontWeight: "bold" }}>{pairError}</p>}
+                        { pairError && <p style={ styles.errorText }>{ pairError }</p> }
 
-                        <div style={{ marginTop: "20px" }}>
+                        <div style={ { marginTop: "8px" } }>
                             <button 
-                                onClick={() => {
-                                    acceptPairRequest(pinInput);
-                                    setPinInput(""); 
-                                }} 
-                                style={{ background: "#4CAF50", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "4px", marginRight: "10px", cursor: "pointer", fontWeight: "bold" }}
+                                onClick={ () => {
+                                    acceptPairRequest( pinInput );
+                                    setPinInput( "" ); 
+                                } } 
+                                style={ { ...styles.button, ...styles.primaryBtn } }
                             >
-                                Verify & Accept
+                                Authenticate & Connect
                             </button>
                             <button 
-                                onClick={() => {
+                                onClick={ () => {
                                     rejectPairRequest();
-                                    setPinInput("");
-                                }} 
-                                style={{ background: "#f44336", color: "#fff", padding: "10px 20px", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold" }}
+                                    setPinInput( "" );
+                                } } 
+                                style={ { ...styles.button, ...styles.secondaryBtn } }
                             >
-                                Cancel
+                                Decline Request
                             </button>
                         </div>
                     </div>
                 </div>
-            )}
+            ) }
         </div>
     );
 }

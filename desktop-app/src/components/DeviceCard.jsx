@@ -1,93 +1,181 @@
-export default function DeviceCard({ 
+/*
+ * FILE: /home/al-amin/Al-amin/Project/Sync_bridge/desktop-app/src/components/DeviceCard.jsx
+ * DESCRIPTION: Premium UI component for displaying individual network devices and their connection states.
+ */
+
+export default function DeviceCard( { 
     device, 
     currentDeviceId, 
     onPairClick, 
     onUnpairClick, 
-    pairedDevices = {}, // 💡 ডিফোল্ট অবজেক্ট দেওয়া হলো যেন undefined এরর না আসে
+    pairedDevices = {}, 
     sentRequestTo 
-}) {
+} ) {
     const isMe = device.deviceId === currentDeviceId;
     
-    // 💡 অবজেক্টের ভেতর এই ডিভাইস আইডিটি 'Key' হিসেবে আছে কিনা তা একদম নিশ্চিতভাবে চেক করা
-    const isPairedWithThisDevice = pairedDevices && Object.prototype.hasOwnProperty.call(pairedDevices, device.deviceId);
+    /**
+     * Determines if the current device is actively paired with this instance by checking
+     * the presence of the device ID within the paired devices object mapping.
+     */
+    const isPairedWithThisDevice = pairedDevices && Object.prototype.hasOwnProperty.call( pairedDevices, device.deviceId );
     
+    /**
+     * Checks if a pairing request has been initiated and is currently pending for this device.
+     */
     const isWaitingForThisDevice = sentRequestTo === device.deviceId;
 
+    const styles = {
+        card: {
+            background: isPairedWithThisDevice 
+                ? "rgba( 16, 185, 129, 0.05 )" 
+                : "rgba( 30, 41, 59, 0.7 )",
+            border: isPairedWithThisDevice 
+                ? "1px solid rgba( 16, 185, 129, 0.3 )" 
+                : "1px solid rgba( 255, 255, 255, 0.1 )",
+            padding: "20px",
+            marginBottom: "16px",
+            borderRadius: "16px",
+            backdropFilter: "blur( 12px )",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            transition: "all 0.3s ease",
+            boxShadow: isPairedWithThisDevice 
+                ? "0 4px 20px rgba( 16, 185, 129, 0.1 )" 
+                : "0 4px 12px rgba( 0, 0, 0, 0.2 )"
+        },
+        infoContainer: { 
+            flex: 1 
+        },
+        deviceName: { 
+            margin: "0 0 4px 0",
+            fontSize: "18px",
+            fontWeight: "600",
+            color: "#f8fafc",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+        },
+        badge: {
+            fontSize: "10px",
+            background: "rgba( 255, 255, 255, 0.1 )",
+            padding: "2px 8px",
+            borderRadius: "100px",
+            color: "#94a3b8",
+            fontWeight: "500",
+            textTransform: "uppercase"
+        },
+        deviceId: { 
+            margin: "0 0 8px 0",
+            fontSize: "12px",
+            fontFamily: "monospace",
+            color: "#64748b" 
+        },
+        statusContainer: { 
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "13px",
+            fontWeight: "500"
+        },
+        statusIndicator: {
+            width: "8px",
+            height: "8px",
+            borderRadius: "50%",
+            background: isPairedWithThisDevice 
+                ? "#10b981" 
+                : ( device.online ? "#10b981" : "#ef4444" )
+        },
+        statusText: {
+            color: isPairedWithThisDevice ? "#10b981" : "#94a3b8"
+        },
+        actions: {
+            display: "flex",
+            alignItems: "center"
+        },
+        button: {
+            padding: "10px 20px",
+            borderRadius: "10px",
+            fontSize: "14px",
+            fontWeight: "600",
+            cursor: "pointer",
+            border: "none",
+            transition: "all 0.2s ease",
+            outline: "none"
+        },
+        disconnectBtn: {
+            background: "rgba( 239, 68, 68, 0.1 )",
+            color: "#ef4444",
+            border: "1px solid rgba( 239, 68, 68, 0.2 )"
+        },
+        pairBtn: {
+            background: device.online 
+                ? "linear-gradient( 135deg, #6366f1 0%, #4f46e5 100% )" 
+                : "#334155",
+            color: "#ffffff",
+            opacity: device.online ? 1 : 0.5,
+            boxShadow: device.online ? "0 4px 12px rgba( 99, 102, 241, 0.3 )" : "none"
+        },
+        pendingText: { 
+            color: "#f59e0b", 
+            fontWeight: "600", 
+            fontSize: "14px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px"
+        }
+    };
+
     return (
-        <div
-            style={{
-                border: isPairedWithThisDevice ? "1px solid #dc3545" : "1px solid gray",
-                padding: "15px",
-                marginBottom: "10px",
-                borderRadius: "10px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                background: isPairedWithThisDevice ? "#fff5f5" : "#fff" // পেয়ারড হলে হালকা লালচে ব্যাকগ্রাউন্ড দিবে
-            }}
-        >
-            <div style={{ flex: 1 }}>
-                <h3 style={{ margin: "0 0 5px 0" }}>
-                    {device.deviceName} {isMe && <span style={{ fontSize: "12px", color: "gray" }}>(Your Device)</span>}
+        <div style={ styles.card }>
+            <div style={ styles.infoContainer }>
+                <h3 style={ styles.deviceName }>
+                    { device.deviceName } 
+                    { isMe && <span style={ styles.badge }>Your Device</span> }
                 </h3>
-                <p style={{ margin: "0 0 5px 0" }}>
-                    <strong>Device ID:</strong> {device.deviceId}
+                <p style={ styles.deviceId }>
+                    { device.deviceId }
                 </p>
-                <p style={{ margin: 0 }}>
-                    <strong>Status:</strong> {isPairedWithThisDevice ? "🔒 Paired" : (device.online ? "🟢 Online" : "🔴 Offline")}
-                </p>
+                <div style={ styles.statusContainer }>
+                    <span style={ styles.statusIndicator }></span>
+                    <span style={ styles.statusText }>
+                        { isPairedWithThisDevice ? "Securely Paired" : ( device.online ? "Available" : "Offline" ) }
+                    </span>
+                </div>
             </div>
 
-            {!isMe && (
-                <div>
-                    {isPairedWithThisDevice ? (
-                        /* 🔴 ডিসকানেক্ট বাটন */
+            { !isMe && (
+                <div style={ styles.actions }>
+                    { isPairedWithThisDevice ? (
+                        /** Active Disconnection Action */
                         <button
                             type="button"
-                            onClick={(e) => {
+                            onClick={ ( e ) => {
                                 e.preventDefault();
-                                console.log("Button Clicked for ID:", device.deviceId); // 💡 ডিবাগিং লগ
-                                onUnpairClick(device.deviceId);
-                            }}
-                            style={{
-                                background: "#dc3545",
-                                color: "white",
-                                border: "none",
-                                padding: "8px 15px",
-                                borderRadius: "5px",
-                                cursor: "pointer", // কার্সার পয়েন্টার নিশ্চিত করা হলো
-                                fontWeight: "bold",
-                                position: "relative",
-                                zIndex: 10 // বাটনটি যেন অন্য কোনো লেয়ারের নিচে ঢাকা না পড়ে
-                            }}
+                                onUnpairClick( device.deviceId );
+                            } }
+                            style={ { ...styles.button, ...styles.disconnectBtn } }
                         >
                             Disconnect
                         </button>
                     ) : isWaitingForThisDevice ? (
-                        /* ⏳ রিকোয়েস্ট পাঠানো অবস্থা */
-                        <span style={{ color: "#ffc107", fontWeight: "bold", fontSize: "14px" }}>
-                            ⏳ Sending Request...
+                        /** Pending Connection State */
+                        <span style={ styles.pendingText }>
+                            <span style={ { animation: "pulse 2s infinite" } }>⏳</span> 
+                            Pairing Request Sent...
                         </span>
                     ) : (
-                        /* 🔵 নরমাল স্টেট: পেয়ার বাটন */
+                        /** Primary Paring Action */
                         <button
-                            onClick={() => onPairClick(device.deviceId)}
-                            disabled={!device.online}
-                            style={{
-                                background: device.online ? "#007BFF" : "#CCCCCC",
-                                color: "white",
-                                border: "none",
-                                padding: "8px 15px",
-                                borderRadius: "5px",
-                                cursor: device.online ? "pointer" : "not-allowed",
-                                fontWeight: "bold"
-                            }}
+                            onClick={ () => onPairClick( device.deviceId ) }
+                            disabled={ !device.online }
+                            style={ { ...styles.button, ...styles.pairBtn, cursor: device.online ? "pointer" : "not-allowed" } }
                         >
-                            Pair Device
+                            Connect Device
                         </button>
-                    )}
+                    ) }
                 </div>
-            )}
+            ) }
         </div>
     );
 }
