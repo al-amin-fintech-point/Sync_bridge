@@ -9,6 +9,9 @@ export default function useDevices() {
     const [deviceId, setDeviceId] = useState("");
     const [devices, setDevices] = useState([]);
 
+    const [incomingRequest, setIncomingRequest] = useState(null); // { fromDeviceId, fromDeviceName }
+    const [pairingInfo, setPairingInfo] = useState(null); // { pairedWith, roomId }
+
     useEffect(() => {
 
         const savedDeviceId = getDeviceId();
@@ -35,18 +38,61 @@ export default function useDevices() {
 
         });
 
+        socket.on("receive-pair-request", (data) => {
+            setIncomingRequest(data);
+        });
+
+        socket.on("pair-success", (data) => {
+            setPairingInfo(data);
+            setIncomingRequest(null);
+        });
+
         return () => {
 
             socket.off("connect");
             socket.off("devices-updated");
 
+            socket.off("receive-pair-request");
+            socket.off("pair-success");
         };
 
     }, []);
 
+    const sendPairRequest = (targetDeviceId) => {
+        socket.emit("send-pair-request", {
+            fromDeviceId: deviceId,
+            toDeviceId: targetDeviceId
+        });
+    };
+
+    const acceptPairRequest = () => {
+        if (incomingRequest) {
+            socket.emit("accept-pair-request", {
+                requesterId: incomingRequest.fromDeviceId,
+                accepterId: deviceId
+            });
+        }
+    };
+
+    const rejectPairRequest = () => {
+        setIncomingRequest(null);
+    };
+
     return {
         socketId,
         deviceId,
-        devices
+        devices,
+        incomingRequest,
+        pairingInfo,
+        sendPairRequest,
+        acceptPairRequest,
+        rejectPairRequest
     };
 }
+
+    // return {
+    //     socketId,
+    //     deviceId,
+    //     devices
+    // };
+// }
