@@ -31,6 +31,15 @@ contextBridge.exposeInMainWorld( "electronAPI", {
      * Dispatches a synchronization payload to overwrite the native OS clipboard buffer.
      * @param { string } text - Plain text format string to commit to the local OS clipboard.
      */
-    writeClipboard: ( text ) => ipcRenderer.send( "write-clipboard", text )
+    writeClipboard: ( text ) => ipcRenderer.send( "write-clipboard", text ),
+
+    /**
+     * Dispatches bundled raw file buffers directly into the main desktop file system threads.
+     * @param { Object } payload - Encapsulated file parameters.
+     * @param { string } payload.fileName - Pure identity string of the target file.
+     * @param { ArrayBuffer } payload.fileBuffer - Raw continuous binary buffer allocations.
+     * @returns { Promise<Object> } Operation confirmations status and paths.
+     */
+    saveSharedFile: ( payload ) => ipcRenderer.invoke( "save-shared-file", payload )
     
 } );

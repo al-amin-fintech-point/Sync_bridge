@@ -20,7 +20,11 @@ import { useState } from "react";
 import Header from "../components/Header";
 import DeviceList from "../components/DeviceList";
 import useDevices from "../hooks/useDevices";
+
 import useClipboardSync from "../hooks/useClipboardSync";
+
+import useFileTransfer from "../hooks/useFileTransfer";
+import FileShare from "../components/FileShare";
 
 export default function Dashboard() {
     const {
@@ -35,11 +39,15 @@ export default function Dashboard() {
         sendPairRequest,
         acceptPairRequest,
         rejectPairRequest,
-        disconnectPair
+        disconnectPair,
+        emitFileSocketEvent
     } = useDevices();
 
     // Isolated Clipboard Synchronization Engine ( Hook Triggered Inline )
     const { lastCopiedText } = useClipboardSync( pairedDevices );
+
+    // High-Volume Binary Data Streaming Engine
+    const { isSending, isReceiving, transferProgress, transferStatus, streamFile } = useFileTransfer( socketId, pairedDevices );
 
     const [ pinInput, setPinInput ] = useState( "" );
 
@@ -242,6 +250,18 @@ export default function Dashboard() {
                         sentRequestTo={ sentRequestTo }
                     />
                 </div>
+
+                { /* File Transfer Operation Panel - Rendered dynamically on authorization handshakes */ }
+                { pairedDeviceCount > 0 && (
+                    <FileShare 
+                        isSending={ isSending }
+                        isReceiving={ isReceiving }
+                        transferProgress={ transferProgress }
+                        transferStatus={ transferStatus }
+                        onFileSelect={ ( file ) => streamFile( file, emitFileSocketEvent ) }
+                    />
+                ) }
+
             </div>
 
             { /** Outgoing Pairing Request PIN Verification Modal */ }

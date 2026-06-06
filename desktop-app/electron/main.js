@@ -75,6 +75,24 @@ app.whenReady().then( () => {
         }
     } );
 
+    // Low-level bridge channel to securely write incoming binary chunks as a file to native OS Downloads folder
+    ipcMain.handle( "save-shared-file", async ( event, { fileName, fileBuffer } ) => {
+        const fs = require( "fs" );
+        const path = require( "path" );
+        
+        try {
+            // Automatically resolve native OS user's profile Downloads path
+            const downloadsPath = path.join( app.getPath( "downloads" ), fileName );
+            
+            // Write the complete combined buffer arrays into physical block storage
+            fs.writeFileSync( downloadsPath, Buffer.from( fileBuffer ) );
+            return { success: true, path: downloadsPath };
+        } catch ( error ) {
+            console.error( "Failed to save file via IPC Main:", error );
+            return { success: false, error: error.message };
+        }
+    } );
+
     createWindow();
 
     app.on( "activate", () => {

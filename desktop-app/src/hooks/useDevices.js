@@ -86,6 +86,15 @@ export default function useDevices() {
             setPairError( "" );
         } );
 
+        // Phase 4 Socket Chunk Streaming Interceptions
+        socket.on( "file-meta", ( data ) => {
+            window.dispatchEvent( new CustomEvent( "syncbridge-file-meta", { detail: data } ) );
+        } );
+
+        socket.on( "file-chunk", ( data ) => {
+            window.dispatchEvent( new CustomEvent( "syncbridge-file-chunk", { detail: data } ) );
+        } );
+
         return () => {
             socket.off( "connect" );
             socket.off( "devices-updated" );
@@ -134,6 +143,20 @@ export default function useDevices() {
         } );
     };
 
+    /**
+     * Custom dispatch bridge to transmit low-level file chunks safely to targeted socket.
+     */
+    const emitFileSocketEvent = ( eventName, payload ) => {
+        if ( socket ) {
+            // Find target paired peer identifier key
+            const targetSocketId = Object.keys( pairedDevices )[0];
+            if ( targetSocketId ) {
+                socket.emit( eventName, { to: targetSocketId, ...payload } );
+            }
+        }
+    };
+
+   
     return {
         socketId,
         deviceId,
@@ -146,6 +169,7 @@ export default function useDevices() {
         sendPairRequest,
         acceptPairRequest,
         rejectPairRequest,
-        disconnectPair
+        disconnectPair,
+        emitFileSocketEvent
     };
 }
