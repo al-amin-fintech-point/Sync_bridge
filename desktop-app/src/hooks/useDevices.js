@@ -36,7 +36,7 @@ export default function useDevices() {
             setSocketId( socket.id );
             socket.emit( "register-device", {
                 deviceId: deviceId,
-                deviceName: "Amin Desktop",
+                deviceName: "Al-Amin Desktop",
                 deviceType: "desktop"
             } );
         };
@@ -85,12 +85,12 @@ export default function useDevices() {
 
         // Phase 4 Socket Chunk Streaming Interceptions
         socket.on( "file-meta", ( data ) => {
-            console.log( "📥 Socket event 'file-meta' received:", data );
+            console.log( "Socket event 'file-meta' received:", data );
             window.dispatchEvent( new CustomEvent( "syncbridge-file-meta", { detail: data } ) );
         } );
 
         socket.on( "file-chunk", ( data ) => {
-            console.log( `📦 Socket event 'file-chunk' received - chunk index: ${data.chunkIndex}` );
+            console.log( `Socket event 'file-chunk' received - chunk index: ${data.chunkIndex}` );
             window.dispatchEvent( new CustomEvent( "syncbridge-file-chunk", { detail: data } ) );
         } );
 
@@ -152,10 +152,10 @@ export default function useDevices() {
         if ( socket ) {
             const resolvedTargetId = targetDeviceId || Object.keys( pairedDevices )[0];
             if ( resolvedTargetId ) {
-                console.log( `📤 Emitting ${eventName} to device: ${resolvedTargetId}` );
+                console.log( `Emitting ${eventName} to device: ${resolvedTargetId}` );
                 socket.emit( eventName, { to: resolvedTargetId, ...payload } );
             } else {
-                console.warn( "⚠️ No paired devices available for file transfer" );
+                console.warn( "No paired devices available for file transfer" );
             }
         }
     };

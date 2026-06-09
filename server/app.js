@@ -209,37 +209,6 @@ io.on( "connection", ( socket ) => {
         }
     } );
 
-    // /**
-    //  * Relays file metadata handshake packet to the targeted mesh peer node.
-    //  */
-    // socket.on( "file-meta", ( data ) => {
-    //     console.log("DEBUG: File Meta Received from", socket.id, "Target:", data.to);
-    //     const { to, fileName, fileSize, totalChunks } = data;
-    //     if ( to ) {
-    //         io.to( to ).emit( "file-meta", {
-    //             from: socket.id,
-    //             fileName,
-    //             fileSize,
-    //             totalChunks
-    //         } );
-    //     }
-    // } );
-
-    // /**
-    //  * Relays high-frequency binary array buffer chunks sequentially to the target peer.
-    //  */
-    // socket.on( "file-chunk", ( data ) => {
-    //     const { to, chunk, chunkIndex } = data;
-    //     if ( to ) {
-    //         io.to( to ).emit( "file-chunk", {
-    //             from: socket.id,
-    //             chunk,
-    //             chunkIndex
-    //         } );
-    //     }
-    // } );
-
-
     /**
      * Relays file metadata handshake packet.
      * Fix: Resolved deviceId to socketId lookup.
@@ -248,14 +217,14 @@ io.on( "connection", ( socket ) => {
         const { to, fileName, fileSize, totalChunks } = data;
         
         console.log( `\n [FILE-META] Received from socket: ${socket.id}` );
-        console.log( `   ├─ Target Device ID: ${to}` );
-        console.log( `   ├─ File: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
+        console.log( ` ├─ Target Device ID: ${to}` );
+        console.log( ` ├─ File: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
         
         const targetDevice = connectedDevices[ to ];
         
         if ( targetDevice && targetDevice.socketId ) {
-            console.log( `   ├─  Target found - Socket: ${targetDevice.socketId}` );
-            console.log( `   └─  Relaying to target...` );
+            console.log( ` ├─  Target found - Socket: ${targetDevice.socketId}` );
+            console.log( ` └─  Relaying to target...` );
             
             io.to( targetDevice.socketId ).emit( "file-meta", {
                 from: socket.id,
@@ -264,8 +233,8 @@ io.on( "connection", ( socket ) => {
                 totalChunks
             } );
         } else {
-            console.log( `   ├─  ERROR: Target device ${to} not found or offline` );
-            console.log( `   └─ Connected devices:`, Object.keys( connectedDevices ) );
+            console.log( ` ├─  ERROR: Target device ${to} not found or offline` );
+            console.log( ` └─ Connected devices:`, Object.keys( connectedDevices ) );
         }
     } );
 

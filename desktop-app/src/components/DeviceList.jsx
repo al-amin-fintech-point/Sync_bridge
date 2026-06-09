@@ -1,6 +1,18 @@
 /**
- * FILE: /home/al-amin/Al-amin/Project/Sync_bridge/desktop-app/src/components/DeviceList.jsx
- * DESCRIPTION: Container component for rendering the active list of network-reachable devices.
+ * ============================================================================
+ * @file        src/components/DeviceList.jsx
+ * @project     SyncBridge - Multi-Device Mesh Network Architecture
+ * @type        Core Custom React Hook
+ * @version     1.1.0
+ * @date        2026-06-06
+ * @academic    Final Year Project ( B.Sc. in Computer Science & Engineering )
+ * @author      Md Al-Amin ( Associate Software Engineer )
+ * @email       mdallamininfo@gmail.com
+ * @phone       +880 1300-385188
+ * @github      https://github.com/al-amin5188/Sync_bridge
+ * @description Container component for rendering the active list of network-reachable devices.
+ * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
+ * ============================================================================
  */
 
 import DeviceCard from "./DeviceCard";

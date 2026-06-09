@@ -36,7 +36,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
         // Listen for incoming file metadata from remote paired device
         const handleFileMeta = ( event ) => {
             const { from, fileName, fileSize, totalChunks } = event.detail;
-            console.log( `📥 File metadata received from ${from}: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
+            console.log( `File metadata received from ${from}: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
             
             setIncomingFileMeta( {
                 from,
@@ -70,11 +70,11 @@ export default function useFileTransfer( socketId, pairedDevices ) {
                 setTransferProgress( progress );
                 setTransferStatus( `Receiving: ${progress}%` );
 
-                console.log( `📦 Chunk ${chunkIndex + 1}/${incomingFileMeta.totalChunks} received (${progress}%)` );
+                console.log( `Chunk ${chunkIndex + 1}/${incomingFileMeta.totalChunks} received (${progress}%)` );
 
                 // Check if all chunks received
                 if ( receivedChunksRef.current[ fileName ] === incomingFileMeta.totalChunks ) {
-                    console.log( `✅ All chunks received for ${fileName}, ready to save` );
+                    console.log( `All chunks received for ${fileName}, ready to save` );
                     // Chunks are stored, user can now accept and save
                 }
             }
@@ -94,7 +94,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
      */
     const streamFile = ( file, emitFileSocketEvent ) => {
         if ( !file || Object.keys( pairedDevices ).length === 0 ) {
-            console.error( "❌ No file selected or no paired devices" );
+            console.error( "No file selected or no paired devices" );
             return;
         }
 
@@ -105,7 +105,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
         const reader = new FileReader();
         const totalChunks = Math.ceil( file.size / CHUNK_SIZE );
 
-        console.log( `📤 Starting file transfer: ${file.name} (${file.size} bytes, ${totalChunks} chunks)` );
+        console.log( `Starting file transfer: ${file.name} (${file.size} bytes, ${totalChunks} chunks)` );
 
         // Send file metadata first
         emitFileSocketEvent( "file-meta", {
@@ -131,7 +131,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
             setTransferProgress( progress );
             setTransferStatus( `Sending: ${progress}%` );
 
-            console.log( `📤 Chunk ${chunkIndex + 1}/${totalChunks} sent (${progress}%)` );
+            console.log( `Chunk ${chunkIndex + 1}/${totalChunks} sent (${progress}%)` );
 
             chunkIndex++;
 
@@ -141,7 +141,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
                 const end = Math.min( start + CHUNK_SIZE, file.size );
                 reader.readAsArrayBuffer( file.slice( start, end ) );
             } else {
-                console.log( `✅ File transfer completed: ${file.name}` );
+                console.log( `File transfer completed: ${file.name}` );
                 setTransferStatus( "Transfer complete! ✅" );
                 setIsSending( false );
 
@@ -154,7 +154,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
         };
 
         reader.onerror = ( error ) => {
-            console.error( "❌ File read error:", error );
+            console.error( "File read error:", error );
             setTransferStatus( "Error reading file" );
             setIsSending( false );
         };
@@ -173,7 +173,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
         const fileName = incomingFileMeta.fileName;
         const chunks = fileChunksRef.current[ fileName ];
 
-        console.log( `💾 Saving file: ${fileName}` );
+        console.log( `Saving file: ${fileName}` );
 
         // Combine all chunks into a single Blob
         const combinedData = new Uint8Array( incomingFileMeta.fileSize );
@@ -207,7 +207,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
         delete fileChunksRef.current[ fileName ];
         delete receivedChunksRef.current[ fileName ];
 
-        console.log( `✅ File saved: ${fileName}` );
+        console.log( `File saved: ${fileName}` );
     };
 
     /**
@@ -215,7 +215,7 @@ export default function useFileTransfer( socketId, pairedDevices ) {
      */
     const declineIncomingFile = () => {
         if ( incomingFileMeta ) {
-            console.log( `❌ Rejected incoming file: ${incomingFileMeta.fileName}` );
+            console.log( `Rejected incoming file: ${incomingFileMeta.fileName}` );
             delete fileChunksRef.current[ incomingFileMeta.fileName ];
             delete receivedChunksRef.current[ incomingFileMeta.fileName ];
         }

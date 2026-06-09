@@ -2,11 +2,17 @@
  * ============================================================================
  * @file        src/components/FileShare.jsx
  * @project     SyncBridge - Multi-Device Mesh Network Architecture
- * @type        Shared Component UI
- * @version     1.0.0
+ * @type        Core Custom React Hook
+ * @version     1.1.0
  * @date        2026-06-06
+ * @academic    Final Year Project ( B.Sc. in Computer Science & Engineering )
+ * @author      Md Al-Amin ( Associate Software Engineer )
+ * @email       mdallamininfo@gmail.com
+ * @phone       +880 1300-385188
+ * @github      https://github.com/al-amin5188/Sync_bridge
  * @description High fidelity dashboard drag-and-drop module visualising streaming
  * byte ratios and network transfer channels cleanly.
+ * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */
 
