@@ -275,7 +275,15 @@ export default function Dashboard() {
                         isReceiving={ isReceiving }
                         transferProgress={ transferProgress }
                         transferStatus={ transferStatus }
-                        onFileSelect={ ( file ) => streamFile( file, emitFileSocketEvent ) }
+                        pairedDevices={ pairedDevices }
+                        // onFileSelect={ ( file, targetDeviceId ) => streamFile( file, emitFileSocketEvent ) }
+
+                        onFileSelect={ ( file, targetDeviceId ) => {
+                            console.log( `🧭 FileShare selected target: ${targetDeviceId} for file: ${file.name}` );
+                            streamFile( file, ( eventName, payload ) => {
+                                emitFileSocketEvent( eventName, targetDeviceId, payload );
+                            } );
+                        }}
                     />
                 ) }
 

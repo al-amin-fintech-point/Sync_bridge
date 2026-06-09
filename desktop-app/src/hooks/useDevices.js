@@ -146,15 +146,14 @@ export default function useDevices() {
 
     /**
      * Custom dispatch bridge to transmit low-level file chunks safely to targeted socket.
-     * FIX: Use deviceId (key) instead of roomId (value) for proper server routing
+     * Receives explicit targetDeviceId from the dropdown selection.
      */
-    const emitFileSocketEvent = ( eventName, payload ) => {
+    const emitFileSocketEvent = ( eventName, targetDeviceId, payload ) => {
         if ( socket ) {
-            // Find target paired peer identifier key (deviceId, not roomId)
-            const targetDeviceId = Object.keys( pairedDevices )[0];
-            if ( targetDeviceId ) {
-                console.log( `📤 Emitting ${eventName} to device: ${targetDeviceId}` );
-                socket.emit( eventName, { to: targetDeviceId, ...payload } );
+            const resolvedTargetId = targetDeviceId || Object.keys( pairedDevices )[0];
+            if ( resolvedTargetId ) {
+                console.log( `📤 Emitting ${eventName} to device: ${resolvedTargetId}` );
+                socket.emit( eventName, { to: resolvedTargetId, ...payload } );
             } else {
                 console.warn( "⚠️ No paired devices available for file transfer" );
             }

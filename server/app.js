@@ -245,26 +245,26 @@ io.on( "connection", ( socket ) => {
      * Fix: Resolved deviceId to socketId lookup.
      */
     socket.on( "file-meta", ( data ) => {
-        const { to, fileName, fileSize, totalChunks } = data; // 'to' এখানে deviceId
+        const { to, fileName, fileSize, totalChunks } = data;
         
-        console.log( `\n📥 [FILE-META] Received from socket: ${socket.id}` );
+        console.log( `\n [FILE-META] Received from socket: ${socket.id}` );
         console.log( `   ├─ Target Device ID: ${to}` );
         console.log( `   ├─ File: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
         
         const targetDevice = connectedDevices[ to ];
         
         if ( targetDevice && targetDevice.socketId ) {
-            console.log( `   ├─ ✅ Target found - Socket: ${targetDevice.socketId}` );
-            console.log( `   └─ 📤 Relaying to target...` );
+            console.log( `   ├─  Target found - Socket: ${targetDevice.socketId}` );
+            console.log( `   └─  Relaying to target...` );
             
             io.to( targetDevice.socketId ).emit( "file-meta", {
-                from: socket.id, // ডিভাইস A এর সকেট আইডি
+                from: socket.id,
                 fileName,
                 fileSize,
                 totalChunks
             } );
         } else {
-            console.log( `   ├─ ❌ ERROR: Target device ${to} not found or offline` );
+            console.log( `   ├─  ERROR: Target device ${to} not found or offline` );
             console.log( `   └─ Connected devices:`, Object.keys( connectedDevices ) );
         }
     } );
@@ -274,9 +274,9 @@ io.on( "connection", ( socket ) => {
      * Fix: Resolved deviceId to socketId lookup.
      */
     socket.on( "file-chunk", ( data ) => {
-        const { to, chunk, chunkIndex } = data; // 'to' এখানে deviceId
+        const { to, chunk, chunkIndex } = data;
         
-        console.log( `📦 [FILE-CHUNK] Received from socket: ${socket.id} - Chunk #${chunkIndex}` );
+        console.log( ` [FILE-CHUNK] Received from socket: ${socket.id} - Chunk #${chunkIndex}` );
         
         const targetDevice = connectedDevices[ to ];
         
@@ -286,9 +286,9 @@ io.on( "connection", ( socket ) => {
                 chunk,
                 chunkIndex
             } );
-            console.log( `   ├─ ✅ Relayed to ${targetDevice.socketId}` );
+            console.log( ` ├─  Relayed to ${targetDevice.socketId}` );
         } else {
-            console.log( `   ├─ ❌ ERROR: Target device ${to} not found` );
+            console.log( ` ├─  ERROR: Target device ${to} not found` );
         }
     } );
 

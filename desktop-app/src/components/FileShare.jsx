@@ -10,10 +10,11 @@
  * ============================================================================
  */
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
-export default function FileShare( { isSending, isReceiving, transferProgress, transferStatus, onFileSelect } ) {
+export default function FileShare( { isSending, isReceiving, transferProgress, transferStatus, onFileSelect, pairedDevices } ) {
     const fileInputRef = useRef( null );
+    const [ selectedTarget, setSelectedTarget ] = useState( "" );
 
     const styles = {
         card: {
@@ -65,18 +66,64 @@ export default function FileShare( { isSending, isReceiving, transferProgress, t
             color: "#818cf8",
             fontWeight: "500",
             fontFamily: "monospace"
+        },
+        card: { 
+            background: "rgba( 30, 41, 59, 0.5 )", 
+            border: "1px solid rgba( 255, 255, 255, 0.1 )", 
+            borderRadius: "20px", 
+            padding: "24px", 
+            marginTop: "32px" 
+        },
+        dropZone: { 
+            border: "2px dashed rgba( 99, 102, 241, 0.4 )", 
+            borderRadius: "12px", 
+            padding: "32px", 
+            textAlign: "center", 
+            cursor: "pointer", 
+            background: "rgba( 15, 23, 42, 0.2 )", 
+            transition: "all 0.2s ease" 
+        },
+        selectContainer: { marginBottom: "16px" },
+        select: {
+            width: "100%",
+            padding: "10px",
+            background: "#1e293b",
+            color: "#f1f5f9",
+            border: "1px solid #334155",
+            borderRadius: "8px",
+            marginBottom: "10px"
         }
     };
 
     const handleFileChange = ( e ) => {
         if ( e.target.files && e.target.files[0] ) {
-            onFileSelect( e.target.files[0] );
+            if ( !selectedTarget ) {
+                alert( "Please select a target device first!" );
+                return;
+            }
+            onFileSelect( e.target.files[0], selectedTarget );
         }
     };
 
     return (
         <div style={ styles.card }>
             <h3 style={ { margin: "0 0 16px 0", fontSize: "18px", color: "#f1f5f9" } }>📂 High-Speed File Streaming</h3>
+
+            <div style={ styles.selectContainer }>
+                <select 
+                    style={ styles.select } 
+                    value={ selectedTarget } 
+                    onChange={ ( e ) => setSelectedTarget( e.target.value ) }
+                    disabled={ isSending || isReceiving }
+                >
+                    <option value="">Select Target Device</option>
+                    { Object.keys( pairedDevices ).map( ( deviceId ) => (
+                        <option key={deviceId} value={deviceId}>
+                            {deviceId.slice( 0, 15 )}... {/* device name or id */}
+                        </option>
+                    ))}
+                </select>
+            </div>
             
             <div 
                 style={ styles.dropZone } 
