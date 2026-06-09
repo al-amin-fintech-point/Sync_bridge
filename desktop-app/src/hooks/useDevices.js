@@ -22,7 +22,7 @@ import { getDeviceId } from "../utils/device";
 
 export default function useDevices() {
     const [ socketId, setSocketId ] = useState( "" );
-    const [ deviceId, setDeviceId ] = useState( "" );
+    const [ deviceId ] = useState( () => getDeviceId() );
     const [ devices, setDevices ] = useState( [] );
     
     const [ incomingRequest, setIncomingRequest ] = useState( null ); 
@@ -32,13 +32,10 @@ export default function useDevices() {
     const [ pairedDevices, setPairedDevices ] = useState( {} );
 
     useEffect( () => {
-        const savedDeviceId = getDeviceId();
-        setDeviceId( savedDeviceId );
-
         const register = () => {
             setSocketId( socket.id );
             socket.emit( "register-device", {
-                deviceId: savedDeviceId,
+                deviceId: deviceId,
                 deviceName: "Amin Desktop",
                 deviceType: "desktop"
             } );
@@ -88,10 +85,12 @@ export default function useDevices() {
 
         // Phase 4 Socket Chunk Streaming Interceptions
         socket.on( "file-meta", ( data ) => {
+            console.log( "📥 Socket event 'file-meta' received:", data );
             window.dispatchEvent( new CustomEvent( "syncbridge-file-meta", { detail: data } ) );
         } );
 
         socket.on( "file-chunk", ( data ) => {
+            console.log( `📦 Socket event 'file-chunk' received - chunk index: ${data.chunkIndex}` );
             window.dispatchEvent( new CustomEvent( "syncbridge-file-chunk", { detail: data } ) );
         } );
 
@@ -104,8 +103,10 @@ export default function useDevices() {
             socket.off( "pair-error" );
             socket.off( "pair-canceled" );
             socket.off( "unpair-success" );
+            socket.off( "file-meta" );
+            socket.off( "file-chunk" );
         };
-    }, [] );
+    }, [ deviceId ] );
 
     // Transmit secure validation sequence request to target node
     const sendPairRequest = ( targetDeviceId ) => {
@@ -145,13 +146,17 @@ export default function useDevices() {
 
     /**
      * Custom dispatch bridge to transmit low-level file chunks safely to targeted socket.
+     * FIX: Use deviceId (key) instead of roomId (value) for proper server routing
      */
     const emitFileSocketEvent = ( eventName, payload ) => {
         if ( socket ) {
-            // Find target paired peer identifier key
-            const targetSocketId = Object.keys( pairedDevices )[0];
-            if ( targetSocketId ) {
-                socket.emit( eventName, { to: targetSocketId, ...payload } );
+            // Find target paired peer identifier key (deviceId, not roomId)
+            const targetDeviceId = Object.keys( pairedDevices )[0];
+            if ( targetDeviceId ) {
+                console.log( `📤 Emitting ${eventName} to device: ${targetDeviceId}` );
+                socket.emit( eventName, { to: targetDeviceId, ...payload } );
+            } else {
+                console.warn( "⚠️ No paired devices available for file transfer" );
             }
         }
     };

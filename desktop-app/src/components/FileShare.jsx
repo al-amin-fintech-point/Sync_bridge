@@ -10,7 +10,7 @@
  * ============================================================================
  */
 
-import React, { useRef } from "react";
+import { useRef } from "react";
 
 export default function FileShare( { isSending, isReceiving, transferProgress, transferStatus, onFileSelect } ) {
     const fileInputRef = useRef( null );

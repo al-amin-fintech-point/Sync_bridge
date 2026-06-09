@@ -209,32 +209,86 @@ io.on( "connection", ( socket ) => {
         }
     } );
 
+    // /**
+    //  * Relays file metadata handshake packet to the targeted mesh peer node.
+    //  */
+    // socket.on( "file-meta", ( data ) => {
+    //     console.log("DEBUG: File Meta Received from", socket.id, "Target:", data.to);
+    //     const { to, fileName, fileSize, totalChunks } = data;
+    //     if ( to ) {
+    //         io.to( to ).emit( "file-meta", {
+    //             from: socket.id,
+    //             fileName,
+    //             fileSize,
+    //             totalChunks
+    //         } );
+    //     }
+    // } );
+
+    // /**
+    //  * Relays high-frequency binary array buffer chunks sequentially to the target peer.
+    //  */
+    // socket.on( "file-chunk", ( data ) => {
+    //     const { to, chunk, chunkIndex } = data;
+    //     if ( to ) {
+    //         io.to( to ).emit( "file-chunk", {
+    //             from: socket.id,
+    //             chunk,
+    //             chunkIndex
+    //         } );
+    //     }
+    // } );
+
+
     /**
-     * Relays file metadata handshake packet to the targeted mesh peer node.
+     * Relays file metadata handshake packet.
+     * Fix: Resolved deviceId to socketId lookup.
      */
     socket.on( "file-meta", ( data ) => {
-        const { to, fileName, fileSize, totalChunks } = data;
-        if ( to ) {
-            io.to( to ).emit( "file-meta", {
-                from: socket.id,
+        const { to, fileName, fileSize, totalChunks } = data; // 'to' এখানে deviceId
+        
+        console.log( `\n📥 [FILE-META] Received from socket: ${socket.id}` );
+        console.log( `   ├─ Target Device ID: ${to}` );
+        console.log( `   ├─ File: ${fileName} (${fileSize} bytes, ${totalChunks} chunks)` );
+        
+        const targetDevice = connectedDevices[ to ];
+        
+        if ( targetDevice && targetDevice.socketId ) {
+            console.log( `   ├─ ✅ Target found - Socket: ${targetDevice.socketId}` );
+            console.log( `   └─ 📤 Relaying to target...` );
+            
+            io.to( targetDevice.socketId ).emit( "file-meta", {
+                from: socket.id, // ডিভাইস A এর সকেট আইডি
                 fileName,
                 fileSize,
                 totalChunks
             } );
+        } else {
+            console.log( `   ├─ ❌ ERROR: Target device ${to} not found or offline` );
+            console.log( `   └─ Connected devices:`, Object.keys( connectedDevices ) );
         }
     } );
 
     /**
-     * Relays high-frequency binary array buffer chunks sequentially to the target peer.
+     * Relays binary chunks.
+     * Fix: Resolved deviceId to socketId lookup.
      */
     socket.on( "file-chunk", ( data ) => {
-        const { to, chunk, chunkIndex } = data;
-        if ( to ) {
-            io.to( to ).emit( "file-chunk", {
+        const { to, chunk, chunkIndex } = data; // 'to' এখানে deviceId
+        
+        console.log( `📦 [FILE-CHUNK] Received from socket: ${socket.id} - Chunk #${chunkIndex}` );
+        
+        const targetDevice = connectedDevices[ to ];
+        
+        if ( targetDevice && targetDevice.socketId ) {
+            io.to( targetDevice.socketId ).emit( "file-chunk", {
                 from: socket.id,
                 chunk,
                 chunkIndex
             } );
+            console.log( `   ├─ ✅ Relayed to ${targetDevice.socketId}` );
+        } else {
+            console.log( `   ├─ ❌ ERROR: Target device ${to} not found` );
         }
     } );
 
