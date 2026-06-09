@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "electron-store": "^11.0.2",
+    "qrcode.react": "^4.2.0",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "socket.io-client": "^4.8.3",

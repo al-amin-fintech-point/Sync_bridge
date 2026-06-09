@@ -20,6 +20,7 @@ import { useState } from "react";
 import Header from "../components/Header";
 import DeviceList from "../components/DeviceList";
 import useDevices from "../hooks/useDevices";
+import { QRCodeSVG } from "qrcode.react";
 
 import useClipboardSync from "../hooks/useClipboardSync";
 
@@ -85,9 +86,21 @@ export default function Dashboard() {
             borderRadius: "20px",
             padding: "24px",
             marginBottom: "32px",
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
             gap: "20px"
+        },
+        infoContainer: {
+            display: "flex",
+            gap: "30px",
+            alignItems: "center"
+        },
+        qrContainer: {
+            background: "#ffffff",
+            padding: "12px",
+            borderRadius: "16px",
+            boxShadow: "0 10px 25px rgba( 0, 0, 0, 0.3 )"
         },
         infoGroup: {
             display: "flex",
@@ -231,23 +244,35 @@ export default function Dashboard() {
                 <Header />
 
                 <div style={ styles.userCard }>
-                    <div style={ styles.infoGroup }>
-                        <span style={ styles.label }>Current Device ID</span>
-                        <span style={ styles.value }>{ deviceId }</span>
-                        { /* Phase 3 Clipboard Status Indicator */ }
-                        { lastCopiedText && (
-                            <span style={ styles.clipboardBadge }>
-                                📋 Clipboard Active Syncing
-                            </span>
-                        ) }
+                    <div style={ styles.infoContainer }>
+                        <div style={ styles.infoGroup }>
+                            <span style={ styles.label }>Current Device ID</span>
+                            <span style={ styles.value }>{ deviceId }</span>
+                            { /* Phase 3 Clipboard Status Indicator */ }
+                            { lastCopiedText && (
+                                <span style={ styles.clipboardBadge }>
+                                    📋 Clipboard Active Syncing
+                                </span>
+                            ) }
+                            <div style={ { ...styles.infoGroup, marginTop: "15px" } }>
+                                <span style={ styles.label }>Active Socket Session</span>
+                                <span style={ styles.value }>{ socketId }</span>
+                            </div>
+                        </div>
                     </div>
-                    <div style={ styles.infoGroup }>
-                        <span style={ styles.label }>Active Socket Session</span>
-                        <span style={ styles.value }>{ socketId }</span>
+
+                    <div style={ styles.qrContainer }>
+                        <QRCodeSVG 
+                            value={ deviceId || "loading" } 
+                            size={ 100 }
+                            level={ "H" }
+                            includeMargin={ false }
+                        />
                     </div>
                 </div>
 
                 { /** Network Status Visualization */ }
+
                 { pairedDeviceCount > 0 && (
                     <div style={ styles.statusBanner }>
                         <span style={ styles.statusIcon }>🛡️</span>
