@@ -19,7 +19,11 @@
 import { io } from "socket.io-client";
 
 // Global WebSocket connection initialization
-const socket = io( "http://192.168.0.205:3000", {
+// const socket = io( "http://192.168.0.205:3000", {
+//     reconnection: true
+// } );
+
+const socket = io( "http://10.96.56.172:3000", {
     reconnection: true
 } );
 
