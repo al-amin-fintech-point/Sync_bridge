@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description Central command center for the SyncBridge mesh network application
- * incorporating dual-hook core handshakes and clipboard distribution syncs.
+ *              incorporating dual-hook core handshakes and clipboard distribution syncs.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

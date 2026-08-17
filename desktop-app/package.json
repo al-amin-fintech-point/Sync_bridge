@@ -10,6 +10,20 @@
     "preview": "vite preview",
     "electron": "electron . --no-sandbox"
   },
+  "build": {
+    "appId": "com.syncbridge.app",
+    "productName": "SyncBridge",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*"
+    ]
+  },
   "dependencies": {
     "electron-store": "^11.0.2",
     "qrcode.react": "^4.2.0",

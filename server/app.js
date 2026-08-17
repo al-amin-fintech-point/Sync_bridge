@@ -5,13 +5,13 @@
  * @type        Core Backend Network Server
  * @version     1.1.0
  * @date        2026-06-06
- * * @academic    Final Year Project ( B.Sc. in Computer Science & Engineering )
+ * @academic    Final Year Project ( B.Sc. in Computer Science & Engineering )
  * @author      Md Al-Amin ( Associate Software Engineer )
  * @email       mdallamininfo@gmail.com
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
- * * @description Real-time socket server enabling local mesh network routing,
- * secure PIN-based multi-device pairing, and state sync.
+ * @description Real-time socket server enabling local mesh network routing,
+ *              secure PIN-based multi-device pairing, and state sync.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

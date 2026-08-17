@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description High-volume binary data streaming engine with explicit consent
- * handshakes, chunk-based transmission, and progress tracking.
+ *              handshakes, chunk-based transmission, and progress tracking.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

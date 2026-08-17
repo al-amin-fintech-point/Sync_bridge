@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description Isolated hook managing global OS clipboard polling, transmission
- * buffers, and incoming network synchronization events.
+ *              buffers, and incoming network synchronization events.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

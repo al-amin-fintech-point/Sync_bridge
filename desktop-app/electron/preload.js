@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description Isolated context bridge layer securely exposing low-level OS
- * native clipboard IPC channels to the frontend rendering layer.
+ *              native clipboard IPC channels to the frontend rendering layer.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

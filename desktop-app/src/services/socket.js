@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description Establishes WebSocket client connection to the SyncBridge 
- * routing server with explicit automatic reconnection profiles.
+ *              routing server with explicit automatic reconnection profiles.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */
@@ -19,7 +19,7 @@
 import { io } from "socket.io-client";
 
 // Global WebSocket connection initialization
-const socket = io( "http://192.168.0.205:3000", {
+const socket = io( "http://10.96.56.172:3000", {
     reconnection: true
 } );
 

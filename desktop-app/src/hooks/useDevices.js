@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description State distribution engine managing local socket network scopes,
- * pairing lifecycle hooks, and automated mesh handshake event states.
+ *              pairing lifecycle hooks, and automated mesh handshake event states.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */

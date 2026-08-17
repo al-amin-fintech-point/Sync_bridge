@@ -11,7 +11,7 @@
  * @phone       +880 1300-385188
  * @github      https://github.com/al-amin5188/Sync_bridge
  * @description Core electron main thread orchestration layer configuring safe
- * context bridges, window lifecycles, and native OS clipboard ipc channels.
+ *              context bridges, window lifecycles, and native OS clipboard ipc channels.
  * @copyright   (c) 2026 Md Al-Amin. All rights reserved.
  * ============================================================================
  */
